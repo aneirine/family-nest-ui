@@ -5,21 +5,30 @@ const treeData = [
     {
         name: "Main Node",
         partners: [
-                {name: "Partner 1"},
-           // {name: "Partner 2"}
+            {name: "Partner 1"},
+            // {name: "Partner 2"}
         ],
         children: [
             {
                 name: "Child 1",
                 partners: [
-                  //  {name: "Child 1 Partner"}
-                   // {name: "Child 1 Partner 2"}
+                    {name: "Child 1 Partner"}
+
                 ],
                 children: []
             },
-      //      {name: "Child 2", partners: [  /* {name: "Child 1 Partner"}*/], children: []},
-          //   {name: "Child 3", partners: [], children: []},
-          //  {name: "Child 3", partners: [], children: []}
+
+            {name: "Child 3", partners: [{name: "Child 1 Partner"}], children: []},
+            {
+                name: "Child 4", partners: [], children: [{
+                    name: "Grand child",
+                    partners: [
+
+                        // {name: "Child 1 Partner 2"}
+                    ],
+                    children: []
+                }]
+            }
         ]
     }
 ];
@@ -33,19 +42,16 @@ const TreeComponent = () => {
 
         const baseNodeSize = 50; // Base radius for calculating spacing
         const partnerSpacingX = containerWidth * 0.02; // 2% of the container width for partner spacing
-        const childSpacingX = containerWidth * 0.02; // 3% of the container width for child spacing (slightly larger)
+        const childSpacingX = containerWidth * 0.02; // 2% of the container width for child spacing
         const childYOffset = containerHeight * 0.15; // 15% of the container height
         const totalNodes = 1 + (node.partners ? node.partners.length : 0); // Main node + number of partners
-
 
         // Calculate the total width considering the radius of the nodes and the spacing between partners
         const totalWidth = totalNodes * (baseNodeSize * 2) + (totalNodes - 1) * partnerSpacingX;
 
         // Calculate the starting X position to center the group under the parent
         const startX = (parentX !== null ? parentX : containerWidth / 2) - (totalWidth / 2);
-
         const centerY = parentY !== null ? parentY + childYOffset : containerHeight / 2; // Position below the parent if parent exists
-
 
         // Place the main node
         let currentX = startX;
@@ -75,13 +81,12 @@ const TreeComponent = () => {
         if (node.children && node.children.length > 0) {
             // Calculate the total width required for all children and their partners
             const totalChildrenWidth = node.children.reduce((width, child) => {
-                const childTotalNodes = 1 + (child.partners ? child.partners.length : 0) /*+ (child.partners ? child.partners.length : 0)*/;
+                const childTotalNodes = 1 + (child.partners ? child.partners.length : 0);
                 return width + (childTotalNodes * (baseNodeSize * 2) + (childTotalNodes - 1) * partnerSpacingX);
             }, 0);
-            console.log("totalChildrenWidth " + totalChildrenWidth);
 
             // Calculate the starting X position for the children group to center it under the current node
-            let childStartX = startX + (totalWidth / 2) - (totalChildrenWidth / 2);
+            let childStartX = (parentX !== null ? parentX : containerWidth / 2) - (totalChildrenWidth / 2);
 
             // Process each child node
             node.children.forEach((child) => {
@@ -89,9 +94,9 @@ const TreeComponent = () => {
                 const childGroupWidth = childTotalNodes * (baseNodeSize * 2) + (childTotalNodes - 1) * partnerSpacingX;
 
                 // Center the child group within its calculated space
-                const childX = childStartX + (childGroupWidth / 2) - (baseNodeSize); // Adjust for node size
+                const childX = childStartX + (childGroupWidth / 2);
 
-                processNode(child, containerWidth, containerHeight * 1.5, results, childX, centerY);
+                processNode(child, containerWidth, containerHeight , results, childX, centerY);
                 childStartX += childGroupWidth + childSpacingX; // Move to the next position for the next child
             });
         }
